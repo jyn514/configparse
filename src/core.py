@@ -3,6 +3,7 @@ The main driver for py-autoconfig
 """
 
 import argparse
+import collections
 import inspect
 import os
 import re
@@ -86,7 +87,7 @@ class Parser(argparse.ArgumentParser):
 
 
 def convert_to_namespace(parser, config, namespace):
-    if isinstance(config, dict):
+    if isinstance(config, collections.abc.Mapping):
         for key, value in config.items():
             setattr(namespace, key, value)
     else:
