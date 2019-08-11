@@ -16,16 +16,12 @@ HOME = os.path.expanduser('~')
 backends = tuple(filter(inspect.ismodule, vars(backends).values()))
 ext_cache = {backend: backend.get_registered_extensions()
                          for backend in backends}
-def ext_for(file):
-    _, ext = os.path.splitext(file)
-    return file, ext
-
 
 def files_in(dir):
     for file in os.listdir(dir):
         file = os.path.join(dir, file)
         if os.path.isfile(file):
-            yield ext_for(file)
+            yield file
 
 
 def get_config_files(prog):
@@ -53,15 +49,16 @@ def get_config_files(prog):
             yield from files_in(entry)
         else:
             # otherwise, return the file itself
-            yield ext_for(entry)
+            yield entry
 
 
-def try_parse(file, ext, parser, namespace):
+def try_parse(file, parser, namespace):
+    _, ext = os.path.splitext(file)
     for (backend, exts) in ext_cache.items():
-        print(ext, exts, backend)
         if ext in exts:
             with open(file) as f:
-                return backend.parse_known_args(parser, f, namespace)
+                config = backend.load(f)
+                return convert_to_namespace(parser, config, namespace)
 
     # TODO: allow setting a default file format?
     warnings.warn("did not find a registered backend for {}. could there be a plugin that's not installed?".format(file))
@@ -80,9 +77,18 @@ class Parser(argparse.ArgumentParser):
         if namespace is None:
             namespace = argparse.Namespace()
 
-        for file, ext in get_config_files(self.prog):
-            namespace = try_parse(file, ext, self, namespace)
+        for file in get_config_files(self.prog):
+            namespace = try_parse(file, self, namespace)
 
         # override configuration with argparse's builtin parsing
         # makes CLI options take precedence over config files
         return super().parse_known_args(args, namespace)
+
+
+def convert_to_namespace(parser, config, namespace):
+    if isinstance(config, dict):
+        for key, value in config.items():
+            setattr(namespace, key, value)
+    else:
+        raise NotImplementedError("configuration besides dictionaries")
+    return namespace
