@@ -61,10 +61,10 @@ def try_parse(file, namespace, default_ext):
         if ext in exts:
             with open(file) as f:
                 config = backend.load(f)
-                return convert_to_namespace(config, namespace)
+                convert_to_namespace(config, namespace)
+                return
 
     warnings.warn("did not find a registered backend for {}. could there be a plugin that's not installed?".format(file))
-    return namespace
 
 
 class Parser(argparse.ArgumentParser):
@@ -86,7 +86,7 @@ class Parser(argparse.ArgumentParser):
             namespace = argparse.Namespace()
 
         for file in get_config_files(self.prog):
-            namespace = try_parse(file, namespace, self.default_ext)
+            try_parse(file, namespace, self.default_ext)
 
         # override configuration with argparse's builtin parsing
         # makes CLI options take precedence over config files
@@ -99,4 +99,3 @@ def convert_to_namespace(config, namespace):
             setattr(namespace, key, value)
     else:
         raise NotImplementedError("configuration besides dictionaries")
-    return namespace
