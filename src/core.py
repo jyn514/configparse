@@ -3,11 +3,9 @@ The main driver for py-autoconfig
 """
 
 import argparse
-import collections
 import inspect
 import os
 import re
-import sys
 import warnings
 from glob import iglob
 
@@ -68,6 +66,7 @@ def try_parse(file, default_ext):
                 return backend.load(f)
 
     warnings.warn("did not find a registered backend for {}. could there be a plugin that's not installed?".format(file))
+    return {}
 
 
 class Parser(argparse.ArgumentParser):
