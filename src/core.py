@@ -11,11 +11,11 @@ from glob import iglob
 
 from . import backends
 
-HOME = os.path.expanduser('~')
+HOME = os.path.expanduser("~")
 
 BACKENDS = tuple(filter(inspect.ismodule, vars(backends).values()))
-EXT_CACHE = {backend: backend.get_registered_extensions()
-             for backend in BACKENDS}
+EXT_CACHE = {backend: backend.get_registered_extensions() for backend in BACKENDS}
+
 
 def files_in(directory):
     for file in os.listdir(directory):
@@ -26,17 +26,17 @@ def files_in(directory):
 
 def get_config_files(prog):
     # check for an OS-specific configuration directory
-    if os.name == 'nt':  # windows
-        config_dir = os.getenv('AppData')
+    if os.name == "nt":  # windows
+        config_dir = os.getenv("AppData")
     else:
-        config_dir = os.getenv('XDG_CONFIG_HOME')
+        config_dir = os.getenv("XDG_CONFIG_HOME")
 
     # assume it's ~/.config otherwise
     if config_dir is None:
-        config_dir = os.path.join(HOME, '.config')
+        config_dir = os.path.join(HOME, ".config")
 
     # get all files with the format ~/.config/{prog}.*
-    for entry in iglob('{}/{}.*'.format(config_dir, prog)):
+    for entry in iglob("{}/{}.*".format(config_dir, prog)):
         yield entry
 
     # add the program directory
@@ -47,7 +47,7 @@ def get_config_files(prog):
         yield from files_in(config_dir)
 
     # get all files with the format ~/.{prog}*
-    for entry in iglob('{}/.{}*'.format(HOME, prog)):
+    for entry in iglob("{}/.{}*".format(HOME, prog)):
         # if it's a directory, return all the files in it
         if os.path.isdir(entry):
             yield from files_in(entry)
@@ -58,29 +58,36 @@ def get_config_files(prog):
 
 def try_parse(file, default_ext):
     _, ext = os.path.splitext(file)
-    if ext == '':
+    if ext == "":
         ext = default_ext
     for (backend, exts) in EXT_CACHE.items():
         if ext in exts:
             with open(file) as f:
                 return backend.load(f)
 
-    warnings.warn("did not find a registered backend for {}. could there be a plugin that's not installed?".format(file))
+    warnings.warn(
+        "did not find a registered backend for {}. could there be a plugin that's not installed?".format(
+            file
+        )
+    )
     return {}
 
 
 class Parser(argparse.ArgumentParser):
     default_ext = ".json"
+
     def __init__(self, *args, prog=None, **kwargs):
         if prog is not None:
-            prog = re.sub(r'\.py$', '', prog)
-        if prog is None or prog == '':
-            raise ValueError("need to know the name of the program to know which config file to parse. call ConfigParser(prog='myprog') to remove this error")
+            prog = re.sub(r"\.py$", "", prog)
+        if prog is None or prog == "":
+            raise ValueError(
+                "need to know the name of the program to know which config file to parse. call ConfigParser(prog='myprog') to remove this error"
+            )
         super().__init__(*args, prog=prog, **kwargs)
 
     def set_default_ext(self, extension):
-        if not extension.startswith('.'):
-            extension = '.' + extension
+        if not extension.startswith("."):
+            extension = "." + extension
         self.default_ext = extension
 
     def parse_known_args(self, args=None, namespace=None):
@@ -88,13 +95,15 @@ class Parser(argparse.ArgumentParser):
         for file in get_config_files(self.prog):
             for key, value in try_parse(file, self.default_ext).items():
                 if not isinstance(value, str):
-                    warnings.warn("types are not supported in configuration files, use strings instead")
+                    warnings.warn(
+                        "types are not supported in configuration files, use strings instead"
+                    )
                     value = str(value)
                 config[key] = value, file
 
         new_args = []
         for key, (val, _) in config.items():
-            new_args.append('--' + key)
+            new_args.append("--" + key)
             new_args.append(val)
 
         # override configuration with argparse's builtin parsing
@@ -115,6 +124,5 @@ class Parser(argparse.ArgumentParser):
             key = key[2:]
             _, filename = config[key]
             warnings.warn("unknown option '%s' (from %s)" % (key, filename))
-        #print(parsed_config)
 
         return super().parse_known_args(args, parsed_config)
