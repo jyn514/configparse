@@ -36,6 +36,10 @@ def get_config_files(prog):
     if config_dir is None:
         config_dir = os.path.join(HOME, '.config')
 
+    # get all files with the format ~/.config/{prog}.*
+    for entry in iglob('{}/{}.*'.format(config_dir, prog)):
+        yield entry
+
     # add the program directory
     config_dir = os.path.join(config_dir, prog)
 

@@ -41,15 +41,18 @@ def test_basic():
     write_home('json', json.dumps({ "apples": "some" }))
     write_config('yml', yaml.dump({ "bananas": "more than none"}))
     write_config('toml', toml.dumps({ "coconuts": "less than 5" }))
+    write(path.join(HOME, '.config', NAME + '.json'), json.dumps({ "figs": "just one" }))
 
     p = pyautoconfig.Parser(prog=NAME)
     p.add_argument("-a", "--apples")
     p.add_argument("-b", "--bananas")
     p.add_argument("-c", "--coconuts")
+    p.add_argument("-f", "--figs")
     args = p.parse_args()
     assert args.apples == 'some'
     assert args.bananas == 'more than none'
     assert args.coconuts == 'less than 5'
+    assert args.figs == 'just one'
     cleanup()
 
 def test_infer_ext():
