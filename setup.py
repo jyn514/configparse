@@ -22,8 +22,10 @@ setup(
     keywords="configuration, argparse",
     url="https://github.com/jyn514/configparse/",
     packages=["configparse"],
-    # TODO: make these optional
-    install_requires=["toml", "pyyaml"],
+    extras_require={
+        "toml": ["toml"],
+        "yaml": ["pyyaml"],
+    },
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Environment :: Console",

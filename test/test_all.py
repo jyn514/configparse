@@ -108,3 +108,10 @@ def test_type():
         assert p.parse_args().honeydew == 5
     write_home(None, json.dumps({ "honeydew": "5" }))
     assert p.parse_args().honeydew == 5
+
+def test_import_error():
+    write("src/backends/blah.py", "import nonexistent_package")
+    write_home(None, json.dumps({ "iceberg": "5" }))
+    p = parser()
+    p.add_argument("--iceberg")
+    assert p.parse_args().iceberg == "5"
