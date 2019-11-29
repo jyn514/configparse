@@ -1,3 +1,9 @@
+## Automated tests
+
+Travis CI is not set up yet, please link run `ln -s ../../test/pre-commit .git/hooks/` in the meantime.
+
+## Adding a backend
+
 To add a backend, add a python file to `src/backends/`.
 There is no restriction on the module name.
 The module must contain the following functions:
