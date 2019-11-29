@@ -13,8 +13,9 @@ All files matching `~/.<prog>*` are read.
 Files are treated according to their extension: `config.json` will be parsed as JSON,
 `myconf.yml` will be parsed as YAML.
 
-- TODO: files without an extension currently give a warning and are not parsed.
-- TODO: allow library uses to set a default file format when extension is missing
+If a file does not have an extension, it will be parsed according to the default
+file format. This is preset to JSON, but can be changed by applications.
+
 
 ### Configuration Directory
 
@@ -40,21 +41,25 @@ if you already have a parser it should be very simple.
 ### As a library
 
 If you are an application developer who wants to use the library,
-there is one entry point: the `ConfigurationParser` class,
+there is one entry point: the `Parser` class,
 which is also aliased to `Parser` for convenience.
-You can treat a `ConfigurationParser` instance exactly as you would an `ArgumentParser`
+You can treat a `Parser` instance exactly as you would an `ArgumentParser`
 instance (as long as you pass `prog` to the constructor).
 
 Note that this means that `parse_args` will parse `sys.argv`
 in addition to parsing configuration files. If you don't want this behavior,
 pass an empty list to `parse_args` like this: `args = parser.parse_args([])`.
 
+If you want to change the default file format (e.g. for files named `~/.myprog`
+without an extension), use  `parser.set_default_ext(ext)`, where 'ext' is the
+file extension for your format.
+
 #### Differences from `argparse`
 
 The only API differences are as follows:
 
-- the name of the parser is `ConfigurationParser`, not `ArgumentParser`
-- the `prog` keyword is required for initializing `ConfigurationParser` (so that it knows where to look for configuration files)
+- the name of the parser is `Parser`, not `ArgumentParser`
+- the `prog` keyword is required for initializing `Parser` (so that it knows where to look for configuration files)
 
 That's it. Everything else is done automatically.
 
