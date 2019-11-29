@@ -44,9 +44,9 @@ if you already have a parser it should be very simple.
 ### As a library
 
 If you are an application developer who wants to use the library,
-there is one entry point: the `Parser` class,
+there is one entry point: the `ConfigParser` class,
 which is also aliased to `Parser` for convenience.
-You can treat a `Parser` instance exactly as you would an `ArgumentParser`
+You can treat a `ConfigParser` instance exactly as you would an `ArgumentParser`
 instance (as long as you pass `prog` to the constructor).
 
 Note that this means that `parse_args` will parse `sys.argv`
@@ -61,8 +61,8 @@ file extension for your format.
 
 The only API differences are as follows:
 
-- the name of the parser is `Parser`, not `ArgumentParser`
-- the `prog` keyword is required for initializing `Parser` (so that it knows where to look for configuration files)
+- the name of the parser is `ConfigParser`, not `ArgumentParser`
+- the `prog` keyword is required for initializing `ConfigParser` (so that it knows where to look for configuration files)
 
 That's it. Everything else is done automatically.
 
@@ -114,12 +114,4 @@ p.add_argument('-s', '--short')
 args = p.parse_args()
 assert args.short is None
 assert args.s == 'some value'
-```
-
-- The `type` option is currently ignored. Assuming a backend returns {'key': '12'}:
-
-```
-p.add_argument('--key', type=int)
-args = p.parse_args()
-assert args.key == 12  # FAILS - args.key is '12'
 ```
