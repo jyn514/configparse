@@ -53,8 +53,10 @@ def get_config_files(prog):
             yield entry
 
 
-def try_parse(file, parser, namespace):
+def try_parse(file, parser, namespace, default_ext):
     _, ext = os.path.splitext(file)
+    if ext == '':
+        ext = default_ext
     for (backend, exts) in ext_cache.items():
         if ext in exts:
             with open(file) as f:
@@ -67,19 +69,25 @@ def try_parse(file, parser, namespace):
 
 
 class Parser(argparse.ArgumentParser):
+    default_ext = ".json"
     def __init__(self, prog=None, *args, **kwargs):
         if prog is not None:
-            prog = re.sub('\.py$', '', prog)
+            prog = re.sub(r'\.py$', '', prog)
         if prog is None or prog == '':
             raise ValueError("need to know the name of the program to know which config file to parse. call ConfigParser(prog='myprog') to remove this error")
         super().__init__(*args, prog=prog, **kwargs)
+
+    def set_default_ext(self, extension):
+        if not extension.startswith('.'):
+            extension = '.' + extension
+        self.default_ext = extension
 
     def parse_known_args(self, args=None, namespace=None):
         if namespace is None:
             namespace = argparse.Namespace()
 
         for file in get_config_files(self.prog):
-            namespace = try_parse(file, self, namespace)
+            namespace = try_parse(file, self, namespace, self.default_ext)
 
         # override configuration with argparse's builtin parsing
         # makes CLI options take precedence over config files
