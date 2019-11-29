@@ -1,0 +1,8 @@
+language: python
+
+install:
+    - pip install -r dev-requirements.txt -r requirements.txt
+    - pip install -e .
+
+script:
+    - "test/pre-commit"
