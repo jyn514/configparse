@@ -1,11 +1,11 @@
-# py-autoconfig
+# configparse
 
-[![Build Status](https://travis-ci.org/jyn514/py-autoconfig.svg?branch=master)](https://travis-ci.org/jyn514/py-autoconfig)
+[![Build Status](https://travis-ci.org/jyn514/configparse.svg?branch=master)](https://travis-ci.org/jyn514/configparse)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Summary
 
-py-autoconfig is a drop-in-place replacement for python's `argparse` module
+configparse is a drop-in-place replacement for python's `argparse` module
 which reads configuration files in addition to command line arguments.
 
 ## Features
@@ -39,7 +39,7 @@ Feel free to submit a pull request adding more formats.
 See CONTRIBUTING.md for an overview,
 if you already have a parser it should be very simple.
 
-## Using py-autoconfig
+## Using configparse
 
 ### As a library
 
@@ -69,7 +69,7 @@ That's it. Everything else is done automatically.
 #### Example
 
 ```python
-from pyautoconfig import Parser
+from configparse import Parser
 
 parser = Parser(prog='myprogram')
 parser.add_argument('--short', '-s', help='use short format')
@@ -107,7 +107,7 @@ it will be treated as if it were a long option, i.e. not looked up.
 For example, assuming some backend returns the dictionary `{'s': 'some value'}`:
 
 ```
-from pyautoconfig import Parser
+from configparse import Parser
 
 p = Parser(prog='myprog')
 p.add_argument('-s', '--short')

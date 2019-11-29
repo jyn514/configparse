@@ -7,7 +7,7 @@ path = os.path
 import toml
 import yaml
 sys.path.append(path.join(path.dirname(__file__), '..'))
-import pyautoconfig
+import configparse
 import pytest
 
 NAME = 'parsertest'
@@ -40,7 +40,7 @@ def write_config(ext, data):
     write(path.join(CONFIG_DIR, 'config.' + ext), data)
 
 def parser():
-    return pyautoconfig.Parser(prog=NAME)
+    return configparse.Parser(prog=NAME)
 
 def test_basic():
     write_home('json', json.dumps({ "apples": "some" }))
@@ -48,7 +48,7 @@ def test_basic():
     write_config('toml', toml.dumps({ "coconuts": "less than 5" }))
     write(path.join(HOME, '.config', NAME + '.json'), json.dumps({ "figs": "just one" }))
 
-    p = pyautoconfig.Parser(prog=NAME)
+    p = configparse.Parser(prog=NAME)
     p.add_argument("-a", "--apples")
     p.add_argument("-b", "--bananas")
     p.add_argument("-c", "--coconuts")
@@ -62,7 +62,7 @@ def test_basic():
 
 def test_infer_ext():
     write_home(None, json.dumps({ "durians": "exactly 6"}))
-    p = pyautoconfig.Parser(prog=NAME)
+    p = configparse.Parser(prog=NAME)
     p.add_argument("-d", "--durians")
     args = p.parse_args()
     assert args.durians == "exactly 6"
@@ -70,7 +70,7 @@ def test_infer_ext():
 
 def test_default_ext():
     write_home(None, yaml.dump({ "elderberries": "your father smells of them"}))
-    p = pyautoconfig.Parser(prog=NAME)
+    p = configparse.Parser(prog=NAME)
     p.add_argument("-e", "--elderberries")
     # with leading .
     p.set_default_ext(".yml")
@@ -86,7 +86,7 @@ def test_default_ext():
 
 def test_positional():
     "make sure we didn't break existing functionality of argparse"
-    p = pyautoconfig.Parser(prog=NAME)
+    p = configparse.Parser(prog=NAME)
     p.add_argument("positional")
     assert p.parse_args(["first arg"]).positional == 'first arg'
     with pytest.raises(SystemExit):
@@ -96,7 +96,7 @@ def test_unknown_config():
     "make sure we give a warning for unknown options"
     write_home(None, json.dumps({ "grapefruit": "big and juicy"}))
     with pytest.warns(UserWarning):
-        pyautoconfig.Parser(prog=NAME).parse_args([])
+        configparse.Parser(prog=NAME).parse_args([])
     cleanup()
 
 def test_type():

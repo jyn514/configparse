@@ -1,5 +1,5 @@
 """"
-The main driver for py-autoconfig
+The main driver for configparse
 """
 
 import argparse

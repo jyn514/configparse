@@ -3,15 +3,15 @@ import os.path
 from sys import stderr
 from setuptools import setup
 
-from pyautoconfig import __version__ as VERSION
+from configparse import __version__ as VERSION
 
-DESCRIPTION = "Python configuration library"
+DESCRIPTION = "Drop-in substitute for argparse that reads config files"
 here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, "README.md")) as f:
     long_description = f.read()
 
 setup(
-    name="pyautoconfig",
+    name="configparse",
     version=VERSION,
     description=DESCRIPTION,
     long_description=long_description,
@@ -20,8 +20,8 @@ setup(
     author_email="jyn514@gmail.com",
     license="BSD",
     keywords="configuration, argparse",
-    url="https://github.com/jyn514/py-autoconfig/",
-    packages=["pyautoconfig"],
+    url="https://github.com/jyn514/configparse/",
+    packages=["configparse"],
     # TODO: make these optional
     install_requires=["toml", "pyyaml"],
     classifiers=[
