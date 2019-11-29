@@ -88,6 +88,9 @@ class Parser(argparse.ArgumentParser):
         config = {}
         for file in get_config_files(self.prog):
             for key, value in try_parse(file, self.default_ext).items():
+                if not isinstance(value, str):
+                    warnings.warn("types are not supported in configuration files, use strings instead")
+                    value = str(value)
                 config[key] = value, file
 
         new_args = []

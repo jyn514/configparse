@@ -39,6 +39,9 @@ def write_home(ext, data):
 def write_config(ext, data):
     write(path.join(CONFIG_DIR, 'config.' + ext), data)
 
+def parser():
+    return pyautoconfig.Parser(prog=NAME)
+
 def test_basic():
     write_home('json', json.dumps({ "apples": "some" }))
     write_config('yml', yaml.dump({ "bananas": "more than none"}))
@@ -95,3 +98,13 @@ def test_unknown_config():
     with pytest.warns(UserWarning):
         pyautoconfig.Parser(prog=NAME).parse_args([])
     cleanup()
+
+def test_type():
+    "make sure type= works properly"
+    write_home(None, json.dumps({ "honeydew": 5 }))
+    p = parser()
+    p.add_argument("--honeydew", type=int)
+    with pytest.warns(UserWarning):
+        assert p.parse_args().honeydew == 5
+    write_home(None, json.dumps({ "honeydew": "5" }))
+    assert p.parse_args().honeydew == 5
