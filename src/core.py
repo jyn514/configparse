@@ -44,7 +44,7 @@ def get_config_files(prog):
         yield from files_in(config_dir)
 
     # get all files with the format ~/.{prog}*
-    for entry in iglob('{}{}.{}*'.format(HOME, '.', prog)):
+    for entry in iglob('{}/.{}*'.format(HOME, prog)):
         # if it's a directory, return all the files in it
         if os.path.isdir(entry):
             yield from files_in(entry)
