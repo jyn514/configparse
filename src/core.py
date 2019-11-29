@@ -7,6 +7,7 @@ import collections
 import inspect
 import os
 import re
+import sys
 import warnings
 from glob import iglob
 
@@ -57,16 +58,14 @@ def get_config_files(prog):
             yield entry
 
 
-def try_parse(file, namespace, default_ext):
+def try_parse(file, default_ext):
     _, ext = os.path.splitext(file)
     if ext == '':
         ext = default_ext
     for (backend, exts) in EXT_CACHE.items():
         if ext in exts:
             with open(file) as f:
-                config = backend.load(f)
-                convert_to_namespace(config, namespace)
-                return
+                return backend.load(f)
 
     warnings.warn("did not find a registered backend for {}. could there be a plugin that's not installed?".format(file))
 
@@ -86,20 +85,25 @@ class Parser(argparse.ArgumentParser):
         self.default_ext = extension
 
     def parse_known_args(self, args=None, namespace=None):
-        if namespace is None:
-            namespace = argparse.Namespace()
-
+        config = {}
         for file in get_config_files(self.prog):
-            try_parse(file, namespace, self.default_ext)
+            for key, value in try_parse(file, self.default_ext).items():
+                config[key] = value, file
+
+        new_args = []
+        for key, (val, _) in config.items():
+            new_args.append('--' + key)
+            new_args.append(val)
 
         # override configuration with argparse's builtin parsing
         # makes CLI options take precedence over config files
-        return super().parse_known_args(args, namespace)
+        parsed_config, unknown = super().parse_known_args(new_args, namespace)
+        print("first call to known_args")
 
+        for key in unknown[::2]:
+            key = key[2:]
+            _, filename = config[key]
+            warnings.warn("unknown option '%s' (from %s)" % (key, filename))
+        #print(parsed_config)
 
-def convert_to_namespace(config, namespace):
-    if isinstance(config, collections.abc.Mapping):
-        for key, value in config.items():
-            setattr(namespace, key, value)
-    else:
-        raise NotImplementedError("configuration besides dictionaries")
+        return super().parse_known_args(args, parsed_config)

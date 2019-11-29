@@ -66,7 +66,7 @@ def test_infer_ext():
 def test_default_ext():
     write_home(None, yaml.dump({ "elderberries": "your father smells of them"}))
     p = pyautoconfig.Parser(prog=NAME)
-    p.add_argument("-e", "--elderberry")
+    p.add_argument("-e", "--elderberries")
     # with leading .
     p.set_default_ext(".yml")
     args = p.parse_args()
