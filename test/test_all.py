@@ -8,6 +8,7 @@ import toml
 import yaml
 sys.path.append(path.join(path.dirname(__file__), '..'))
 import pyautoconfig
+import pytest
 
 NAME = 'parsertest'
 HOME = path.expanduser('~')
@@ -23,6 +24,7 @@ def cleanup():
 atexit.register(cleanup)
 
 def write(filename, data):
+    os.makedirs(CONFIG_DIR, exist_ok=True)
     with open(filename, 'w') as fd:
         CREATED_FILES.add(filename)
         fd.write(data)
@@ -77,4 +79,19 @@ def test_default_ext():
     p.set_default_ext("json")
     args = p.parse_args()
     assert args.elderberries == "your father smells of them"
+    cleanup()
+
+def test_positional():
+    "make sure we didn't break existing functionality of argparse"
+    p = pyautoconfig.Parser(prog=NAME)
+    p.add_argument("positional")
+    assert p.parse_args(["first arg"]).positional == 'first arg'
+    with pytest.raises(SystemExit):
+        p.parse_args([])
+
+def test_unknown_config():
+    "make sure we give a warning for unknown options"
+    write_home(None, json.dumps({ "grapefruit": "big and juicy"}))
+    with pytest.warns(UserWarning):
+        pyautoconfig.Parser(prog=NAME).parse_args([])
     cleanup()

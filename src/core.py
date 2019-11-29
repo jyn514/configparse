@@ -97,8 +97,17 @@ class Parser(argparse.ArgumentParser):
 
         # override configuration with argparse's builtin parsing
         # makes CLI options take precedence over config files
+        # HACK: make all these not required to avoid argparse exiting
+        # HACK: if there are too few args
+        # see https://stackoverflow.com/a/59105511/7669110
+        temp_actions = []
+        for action in self._actions:
+            if action.required:
+                action.required = False
+                temp_actions.append(action)
         parsed_config, unknown = super().parse_known_args(new_args, namespace)
-        print("first call to known_args")
+        for action in temp_actions:
+            action.required = True
 
         for key in unknown[::2]:
             key = key[2:]
