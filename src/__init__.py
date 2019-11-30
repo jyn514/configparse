@@ -1,4 +1,4 @@
 from .core import Parser
 
-ConfigurationParser = Parser
+ConfigParser = Parser
 __version__ = "0.1.3"
