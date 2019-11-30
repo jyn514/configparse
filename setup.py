@@ -21,7 +21,7 @@ setup(
     license="BSD",
     keywords="configuration, argparse",
     url="https://github.com/jyn514/configparse/",
-    packages=["configparse"],
+    packages=["configparse", "configparse.backends"],
     extras_require={
         "toml": ["toml"],
         "yaml": ["pyyaml"],
