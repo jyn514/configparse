@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ev
+set -e
 
 VERSION_FILE=src/__init__.py
 VERSION_VAR=__version__
