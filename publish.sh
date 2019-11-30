@@ -9,7 +9,7 @@ case "$1" in
 	test) shift; REPO='--repository-url https://test.pypi.org/legacy/';;
 	*) REPO= ;;
 esac
-rm -rf dist
+rm -rf dist build
 
 read -r major minor patch < <(sed -n "s/$VERSION_VAR = \"$VERSION_REGEX\"/\1 \2 \3/p" "$VERSION_FILE")
 case "$1" in
